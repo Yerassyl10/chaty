@@ -1,14 +1,70 @@
 <!-- chat/templates/chat/room.html -->
 <!DOCTYPE html>
 <html>
-
 <head>
-    <meta charset="utf-8" />
+    <meta charset="utf-8"/>
     <title>Chat Room</title>
-</head>
+    <h1>Support chat</h1>
+    <style>
+        h1{
+            color:#F8690D;
+            font-size: 70px;
+            margin-left: 25%;
+        }
+        body {
+            margin: 0 auto;
+            max-width: 800px;
+            padding: 0 20px;
 
+}
+
+        #chat-log {
+
+        }
+        #Div1 {
+
+            color: black;
+            padding: 18px 20px;
+            line-height: 26px;
+            font-size: 20px;
+            margin-bottom: 30px;
+            border-radius: 15%;
+            width: 90%;
+            position: relative;
+            background: #ff9d27;
+
+        }
+
+        #chat-message-input{
+            width: 100%;
+            padding: 12px 20px;
+            margin: 8px 0;
+            display: inline-block;
+            border: 1px solid #F8690D;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        #chat-message-submit{
+              display: inline-block;
+              padding: 15px 25px;
+              font-size: 24px;
+              cursor: pointer;
+              text-align: center;
+              text-decoration: none;
+              outline: none;
+              color: #fff;
+              background-color: #F8690D;
+              border: none;
+              border-radius: 15px;
+              box-shadow: 0 9px #999;
+        }
+
+
+
+    </style>
+</head>
 <body>
-    <textarea id="chat-log" cols="100" rows="20"></textarea><br>
+    <div id="chat-log" cols="80" rows="60"></div><br>
     <input id="chat-message-input" type="text" size="100"><br>
     <input id="chat-message-submit" type="button" value="Send">
     {{ room_name|json_script:"room-name" }}
@@ -16,30 +72,33 @@
         const roomName = JSON.parse(document.getElementById('room-name').textContent);
 
         const chatSocket = new WebSocket(
-            'ws://' +
-            window.location.host +
-            '/ws/chat/' +
-            roomName +
-            '/'
+            'ws://'
+            + window.location.host
+            + '/ws/chat/'
+            + roomName
+            + '/'
         );
 
-        chatSocket.onmessage = function (e) {
+        chatSocket.onmessage = function(e) {
             const data = JSON.parse(e.data);
-            document.querySelector('#chat-log').value += (data.message + '\n');
+            let messagee = document.createElement('div');
+            messagee.setAttribute("id", "Div1");
+            messagee.innerHTML = data.message
+            document.querySelector('#chat-log').appendChild(messagee);
         };
 
-        chatSocket.onclose = function (e) {
+        chatSocket.onclose = function(e) {
             console.error('Chat socket closed unexpectedly');
         };
 
         document.querySelector('#chat-message-input').focus();
-        document.querySelector('#chat-message-input').onkeyup = function (e) {
-            if (e.keyCode === 13) { // enter, return
+        document.querySelector('#chat-message-input').onkeyup = function(e) {
+            if (e.keyCode === 13) {  // enter, return
                 document.querySelector('#chat-message-submit').click();
             }
         };
 
-        document.querySelector('#chat-message-submit').onclick = function (e) {
+        document.querySelector('#chat-message-submit').onclick = function(e) {
             const messageInputDom = document.querySelector('#chat-message-input');
             const message = messageInputDom.value;
             chatSocket.send(JSON.stringify({
@@ -49,5 +108,4 @@
         };
     </script>
 </body>
-
 </html>
